@@ -20,6 +20,8 @@
 		C175FE782579905300C8DF50 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C175FE772579905300C8DF50 /* Demo.swift */; };
 		CB4FB651273AE23B00119FD3 /* TurboNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB650273AE23B00119FD3 /* TurboNavigationController.swift */; };
 		CB4FB652273AE23C00119FD4 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB653273AE23C00119FD4 /* TabBarController.swift */; };
+		CB4FB654273AE23D00119FD5 /* SidebarMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB655273AE23D00119FD5 /* SidebarMenuController.swift */; };
+		CB4FB656273AE23E00119FD6 /* SidebarContainerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4FB657273AE23E00119FD6 /* SidebarContainerController.swift */; };
 		E226F7822AB1B7F20059D594 /* Strada in Frameworks */ = {isa = PBXBuildFile; productRef = E226F7812AB1B7F20059D594 /* Strada */; };
 		E226F7842AB1BBF30059D594 /* TurboWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E226F7832AB1BBF30059D594 /* TurboWebViewController.swift */; };
 		E226F7872AB1BE030059D594 /* WKWebViewConfiguration+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E226F7862AB1BE030059D594 /* WKWebViewConfiguration+App.swift */; };
@@ -58,6 +60,8 @@
 		C175FE772579905300C8DF50 /* Demo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
 		CB4FB650273AE23B00119FD3 /* TurboNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TurboNavigationController.swift; sourceTree = "<group>"; };
 		CB4FB653273AE23C00119FD4 /* TabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		CB4FB655273AE23D00119FD5 /* SidebarMenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SidebarMenuController.swift; sourceTree = "<group>"; };
+		CB4FB657273AE23E00119FD6 /* SidebarContainerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SidebarContainerController.swift; sourceTree = "<group>"; };
 		E226F7832AB1BBF30059D594 /* TurboWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TurboWebViewController.swift; sourceTree = "<group>"; };
 		E226F7862AB1BE030059D594 /* WKWebViewConfiguration+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebViewConfiguration+App.swift"; sourceTree = "<group>"; };
 		E226F7892AB1BF880059D594 /* FormComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormComponent.swift; sourceTree = "<group>"; };
@@ -140,6 +144,8 @@
 			children = (
 				CB4FB650273AE23B00119FD3 /* TurboNavigationController.swift */,
 				CB4FB653273AE23C00119FD4 /* TabBarController.swift */,
+				CB4FB655273AE23D00119FD5 /* SidebarMenuController.swift */,
+				CB4FB657273AE23E00119FD6 /* SidebarContainerController.swift */,
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -251,6 +257,8 @@
 				E226F78C2AB1CE2E0059D594 /* BridgeComponent+App.swift in Sources */,
 				CB4FB651273AE23B00119FD3 /* TurboNavigationController.swift in Sources */,
 				CB4FB652273AE23C00119FD4 /* TabBarController.swift in Sources */,
+				CB4FB654273AE23D00119FD5 /* SidebarMenuController.swift in Sources */,
+				CB4FB656273AE23E00119FD6 /* SidebarContainerController.swift in Sources */,
 				E226F7872AB1BE030059D594 /* WKWebViewConfiguration+App.swift in Sources */,
 				C175FE782579905300C8DF50 /* Demo.swift in Sources */,
 				C153F00A2578057900926D30 /* SceneController.swift in Sources */,

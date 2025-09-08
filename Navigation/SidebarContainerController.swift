@@ -1,0 +1,225 @@
+//
+//  SidebarContainerController.swift
+//  Demo
+//
+//  Created by Assistant on 01/01/24.
+//
+
+import UIKit
+import Turbo
+
+class SidebarContainerController: UIViewController {
+    
+    private let mainTabBarController: TabBarController
+    private let sidebarMenuController: SidebarMenuController
+    
+    private var isSidebarOpen = false
+    private let sidebarWidth: CGFloat = 280
+    
+    private lazy var overlayView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.alpha = 0
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(overlayTapped))
+        view.addGestureRecognizer(tapGesture)
+        
+        return view
+    }()
+    
+    private var sidebarLeadingConstraint: NSLayoutConstraint!
+    
+    init(tabBarController: TabBarController) {
+        self.mainTabBarController = tabBarController
+        self.sidebarMenuController = SidebarMenuController()
+        super.init(nibName: nil, bundle: nil)
+        
+        self.sidebarMenuController.delegate = self
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        setupHamburgerButton()
+    }
+    
+    private func setupUI() {
+        view.backgroundColor = UIColor.systemBackground
+        
+        // Add tab bar controller as child
+        addChild(mainTabBarController)
+        view.addSubview(mainTabBarController.view)
+        mainTabBarController.view.translatesAutoresizingMaskIntoConstraints = false
+        mainTabBarController.didMove(toParent: self)
+        
+        // Add overlay view
+        view.addSubview(overlayView)
+        
+        // Add sidebar menu controller as child
+        addChild(sidebarMenuController)
+        view.addSubview(sidebarMenuController.view)
+        sidebarMenuController.view.translatesAutoresizingMaskIntoConstraints = false
+        sidebarMenuController.didMove(toParent: self)
+        
+        // Setup constraints
+        sidebarLeadingConstraint = sidebarMenuController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -sidebarWidth)
+        
+        NSLayoutConstraint.activate([
+            // Tab bar controller constraints
+            mainTabBarController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            mainTabBarController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            mainTabBarController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            mainTabBarController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // Overlay constraints
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // Sidebar constraints
+            sidebarLeadingConstraint,
+            sidebarMenuController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            sidebarMenuController.view.widthAnchor.constraint(equalToConstant: sidebarWidth),
+            sidebarMenuController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        // Add shadow to sidebar
+        sidebarMenuController.view.layer.shadowColor = UIColor.black.cgColor
+        sidebarMenuController.view.layer.shadowOpacity = 0.3
+        sidebarMenuController.view.layer.shadowOffset = CGSize(width: 2, height: 0)
+        sidebarMenuController.view.layer.shadowRadius = 5
+    }
+    
+    private func setupHamburgerButton() {
+        // Create hamburger button with 3 lines of different sizes
+        let hamburgerButton = createHamburgerButton()
+        hamburgerButton.addTarget(self, action: #selector(hamburgerButtonTapped), for: .touchUpInside)
+        
+        let barButtonItem = UIBarButtonItem(customView: hamburgerButton)
+        
+        // Add hamburger button to all navigation controllers in tab bar
+        if let viewControllers = mainTabBarController.viewControllers {
+            for viewController in viewControllers {
+                if let navController = viewController as? UINavigationController {
+                    navController.topViewController?.navigationItem.leftBarButtonItem = barButtonItem
+                }
+            }
+        }
+    }
+    
+    private func createHamburgerButton() -> UIButton {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        
+        // Create hamburger icon with 3 lines of different sizes
+        let image = createHamburgerIcon()
+        button.setImage(image, for: .normal)
+        button.tintColor = UIColor.label
+        
+        return button
+    }
+    
+    private func createHamburgerIcon() -> UIImage? {
+        let size = CGSize(width: 24, height: 18)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        
+        return renderer.image { context in
+            let cgContext = context.cgContext
+            cgContext.setStrokeColor(UIColor.label.cgColor)
+            cgContext.setLineWidth(2.0)
+            cgContext.setLineCap(.round)
+            
+            // Top line (longest)
+            cgContext.move(to: CGPoint(x: 0, y: 3))
+            cgContext.addLine(to: CGPoint(x: 24, y: 3))
+            
+            // Middle line (medium)
+            cgContext.move(to: CGPoint(x: 0, y: 9))
+            cgContext.addLine(to: CGPoint(x: 18, y: 9))
+            
+            // Bottom line (shortest)
+            cgContext.move(to: CGPoint(x: 0, y: 15))
+            cgContext.addLine(to: CGPoint(x: 12, y: 15))
+            
+            cgContext.strokePath()
+        }
+    }
+    
+    @objc private func hamburgerButtonTapped() {
+        toggleSidebar()
+    }
+    
+    @objc private func overlayTapped() {
+        closeSidebar()
+    }
+    
+    private func toggleSidebar() {
+        if isSidebarOpen {
+            closeSidebar()
+        } else {
+            openSidebar()
+        }
+    }
+    
+    private func openSidebar() {
+        isSidebarOpen = true
+        sidebarLeadingConstraint.constant = 0
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            self.view.layoutIfNeeded()
+            self.overlayView.alpha = 1
+        }
+    }
+    
+    private func closeSidebar() {
+        isSidebarOpen = false
+        sidebarLeadingConstraint.constant = -sidebarWidth
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+            self.view.layoutIfNeeded()
+            self.overlayView.alpha = 0
+        }
+    }
+    
+    // Public method to navigate (used by SceneController)
+    func navigate(to url: URL, options: VisitOptions = VisitOptions(), properties: PathProperties = [:]) {
+        mainTabBarController.navigate(to: url, options: options, properties: properties)
+    }
+    
+    // Forward session properties
+    var session: Session! {
+        get { mainTabBarController.session }
+        set { mainTabBarController.session = newValue }
+    }
+    
+    var modalSession: Session! {
+        get { mainTabBarController.modalSession }
+        set { mainTabBarController.modalSession = newValue }
+    }
+}
+
+// MARK: - SidebarMenuDelegate
+extension SidebarContainerController: SidebarMenuDelegate {
+    
+    func sidebarMenuDidSelectDashboard() {
+        mainTabBarController.selectedIndex = 0
+        let dashboardURL = URL(string: "http://localhost:8000/dashboard")!
+        mainTabBarController.navigate(to: dashboardURL)
+    }
+    
+    func sidebarMenuDidSelectSettings() {
+        mainTabBarController.selectedIndex = 1
+        let settingsURL = URL(string: "http://localhost:8000/settings")!
+        mainTabBarController.navigate(to: settingsURL)
+    }
+    
+    func sidebarMenuShouldClose() {
+        closeSidebar()
+    }
+}

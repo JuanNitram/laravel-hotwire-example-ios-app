@@ -9,7 +9,7 @@ final class SceneController: UIResponder {
     
     var window: UIWindow?
     private let rootURL = Demo.current
-    private var tabBarController: TabBarController!
+    private var sidebarContainerController: SidebarContainerController!
     
     // MARK: - Setup
     
@@ -20,15 +20,16 @@ final class SceneController: UIResponder {
         
         window.tintColor = UIColor(named: "Tint")
         
-        if let existingTabBarController = window.rootViewController as? TabBarController {
-            tabBarController = existingTabBarController
+        if let existingContainer = window.rootViewController as? SidebarContainerController {
+            sidebarContainerController = existingContainer
         } else {
-            tabBarController = TabBarController()
-            window.rootViewController = tabBarController
+            let tabBarController = TabBarController()
+            sidebarContainerController = SidebarContainerController(tabBarController: tabBarController)
+            window.rootViewController = sidebarContainerController
         }
         
-        tabBarController.session = session
-        tabBarController.modalSession = modalSession
+        sidebarContainerController.session = session
+        sidebarContainerController.modalSession = modalSession
     }
     
     // MARK: - Authentication
@@ -36,7 +37,7 @@ final class SceneController: UIResponder {
     private func promptForAuthentication() {
         let authURL = rootURL.appendingPathComponent("/signin")
         let properties = pathConfiguration.properties(for: authURL)
-        tabBarController.navigate(to: authURL, options: VisitOptions(), properties: properties)
+        sidebarContainerController.navigate(to: authURL, options: VisitOptions(), properties: properties)
     }
     
     // MARK: - Sessions
@@ -74,13 +75,13 @@ extension SceneController: UIWindowSceneDelegate {
         configureRootViewController()
         // Navigate to dashboard by default
         let dashboardURL = rootURL.appendingPathComponent("/dashboard")
-        tabBarController.navigate(to: dashboardURL, options: VisitOptions(action: .replace), properties: [:])
+        sidebarContainerController.navigate(to: dashboardURL, options: VisitOptions(action: .replace), properties: [:])
     }
 }
 
 extension SceneController: SessionDelegate {
     func session(_ session: Session, didProposeVisit proposal: VisitProposal) {
-        tabBarController.navigate(to: proposal.url, options: proposal.options, properties: proposal.properties)
+        sidebarContainerController.navigate(to: proposal.url, options: proposal.options, properties: proposal.properties)
     }
     
     func session(_ session: Session, didFailRequestForVisitable visitable: Visitable, error: Error) {
@@ -93,7 +94,7 @@ extension SceneController: SessionDelegate {
         } else {
             let alert = UIAlertController(title: "Visit failed!", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            tabBarController.present(alert, animated: true)
+            sidebarContainerController.present(alert, animated: true)
         }
     }
 
@@ -130,7 +131,7 @@ extension SceneController: WKNavigationDelegate {
             // to open all audio/video/images in a native media viewer
             if url.host == rootURL.host, !url.pathExtension.isEmpty {
                 let safariViewController = SFSafariViewController(url: url)
-                tabBarController.present(safariViewController, animated: true)
+                sidebarContainerController.present(safariViewController, animated: true)
             } else {
                 UIApplication.shared.open(url)
             }
