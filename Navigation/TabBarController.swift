@@ -60,6 +60,19 @@ class TabBarController: UITabBarController {
         // Configure tab bar appearance
         tabBar.tintColor = UIColor(named: "Tint")
         tabBar.backgroundColor = UIColor.systemBackground
+        
+        // Add subtle border to top of tab bar
+        let tabBarBorder = UIView()
+        tabBarBorder.backgroundColor = UIColor.separator.withAlphaComponent(0.3)
+        tabBarBorder.translatesAutoresizingMaskIntoConstraints = false
+        tabBar.addSubview(tabBarBorder)
+        
+        NSLayoutConstraint.activate([
+            tabBarBorder.topAnchor.constraint(equalTo: tabBar.topAnchor),
+            tabBarBorder.leadingAnchor.constraint(equalTo: tabBar.leadingAnchor),
+            tabBarBorder.trailingAnchor.constraint(equalTo: tabBar.trailingAnchor),
+            tabBarBorder.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
     }
     
     private func configureSessionsIfReady() {

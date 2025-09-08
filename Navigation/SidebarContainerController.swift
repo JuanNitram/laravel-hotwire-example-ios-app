@@ -108,8 +108,42 @@ class SidebarContainerController: UIViewController {
             for viewController in viewControllers {
                 if let navController = viewController as? UINavigationController {
                     navController.topViewController?.navigationItem.leftBarButtonItem = barButtonItem
+                    
+                    // Configure navigation bar appearance to match tab bar
+                    configureNavigationBarAppearance(for: navController)
                 }
             }
+        }
+    }
+    
+    private func configureNavigationBarAppearance(for navigationController: UINavigationController) {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        
+        // Set background color to match tab bar
+        appearance.backgroundColor = UIColor.systemBackground
+        
+        // Add subtle bottom border
+        appearance.shadowColor = UIColor.separator.withAlphaComponent(0.3)
+        appearance.shadowImage = createBorderImage()
+        
+        // Apply appearance
+        navigationController.navigationBar.standardAppearance = appearance
+        navigationController.navigationBar.scrollEdgeAppearance = appearance
+        navigationController.navigationBar.compactAppearance = appearance
+        
+        if #available(iOS 15.0, *) {
+            navigationController.navigationBar.compactScrollEdgeAppearance = appearance
+        }
+    }
+    
+    private func createBorderImage() -> UIImage? {
+        let size = CGSize(width: 1, height: 0.5)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        
+        return renderer.image { context in
+            UIColor.separator.withAlphaComponent(0.3).setFill()
+            context.fill(CGRect(origin: .zero, size: size))
         }
     }
     
