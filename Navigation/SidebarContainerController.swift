@@ -46,6 +46,11 @@ class SidebarContainerController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupHamburgerButton()
+        setupNotificationObservers()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupUI() {
@@ -97,22 +102,65 @@ class SidebarContainerController: UIViewController {
     }
     
     private func setupHamburgerButton() {
+        // Add hamburger button to all navigation controllers in tab bar
+        if let viewControllers = mainTabBarController.viewControllers {
+            for viewController in viewControllers {
+                if let navController = viewController as? UINavigationController {
+                    addHamburgerButtonToNavigationController(navController)
+                }
+            }
+        }
+    }
+    
+    private func addHamburgerButtonToNavigationController(_ navController: UINavigationController) {
         // Create hamburger button with 3 lines of different sizes
         let hamburgerButton = createHamburgerButton()
         hamburgerButton.addTarget(self, action: #selector(hamburgerButtonTapped), for: .touchUpInside)
         
         let barButtonItem = UIBarButtonItem(customView: hamburgerButton)
+        navController.topViewController?.navigationItem.leftBarButtonItem = barButtonItem
         
-        // Add hamburger button to all navigation controllers in tab bar
-        if let viewControllers = mainTabBarController.viewControllers {
-            for viewController in viewControllers {
-                if let navController = viewController as? UINavigationController {
-                    navController.topViewController?.navigationItem.leftBarButtonItem = barButtonItem
-                    
-                    // Configure navigation bar appearance to match tab bar
-                    configureNavigationBarAppearance(for: navController)
-                }
-            }
+        // Configure navigation bar appearance to match tab bar
+        configureNavigationBarAppearance(for: navController)
+    }
+    
+    private func setupNotificationObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(settingsTabLoaded(_:)),
+            name: NSNotification.Name("SettingsTabLoaded"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(navigationControllerDidSetViewController(_:)),
+            name: NSNotification.Name("NavigationControllerDidSetViewController"),
+            object: nil
+        )
+    }
+    
+    @objc private func settingsTabLoaded(_ notification: Notification) {
+        guard let navController = notification.object as? UINavigationController else { return }
+        
+        // Add hamburger button to the newly loaded settings navigation controller
+        addHamburgerButtonToNavigationController(navController)
+    }
+    
+    @objc private func navigationControllerDidSetViewController(_ notification: Notification) {
+        guard let navController = notification.object as? UINavigationController,
+              let viewController = notification.userInfo?["viewController"] as? UIViewController else { return }
+        
+        // Check if this navigation controller belongs to our tab bar
+        if let tabViewControllers = mainTabBarController.viewControllers,
+           tabViewControllers.contains(navController) {
+            
+            // Add hamburger button to the new view controller
+            let hamburgerButton = createHamburgerButton()
+            hamburgerButton.addTarget(self, action: #selector(hamburgerButtonTapped), for: .touchUpInside)
+            let barButtonItem = UIBarButtonItem(customView: hamburgerButton)
+            
+            viewController.navigationItem.leftBarButtonItem = barButtonItem
         }
     }
     
@@ -244,13 +292,13 @@ extension SidebarContainerController: SidebarMenuDelegate {
     func sidebarMenuDidSelectDashboard() {
         mainTabBarController.selectedIndex = 0
         let dashboardURL = URL(string: "http://localhost:8000/dashboard")!
-        mainTabBarController.navigate(to: dashboardURL)
+        mainTabBarController.navigate(to: dashboardURL, options: VisitOptions(action: .replace))
     }
     
     func sidebarMenuDidSelectSettings() {
         mainTabBarController.selectedIndex = 1
         let settingsURL = URL(string: "http://localhost:8000/settings")!
-        mainTabBarController.navigate(to: settingsURL)
+        mainTabBarController.navigate(to: settingsURL, options: VisitOptions(action: .replace))
     }
     
     func sidebarMenuShouldClose() {

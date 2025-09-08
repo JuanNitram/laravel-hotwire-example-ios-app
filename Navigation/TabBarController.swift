@@ -126,6 +126,9 @@ class TabBarController: UITabBarController {
                     options: VisitOptions(action: .replace),
                     properties: properties
                 )
+                
+                // Notify parent that settings was loaded so hamburger button can be added
+                NotificationCenter.default.post(name: NSNotification.Name("SettingsTabLoaded"), object: settingsNavController)
             }
         default:
             break

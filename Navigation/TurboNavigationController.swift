@@ -93,8 +93,22 @@ extension TurboNavigationController {
         } else if action == .replace {
             let viewControllers = Array(viewControllers.dropLast()) + [viewController]
             setViewControllers(viewControllers, animated: false)
+            
+            // Notify that a new view controller was set
+            NotificationCenter.default.post(
+                name: NSNotification.Name("NavigationControllerDidSetViewController"),
+                object: self,
+                userInfo: ["viewController": viewController]
+            )
         } else {
             pushViewController(viewController, animated: animated)
+            
+            // Notify that a new view controller was pushed
+            NotificationCenter.default.post(
+                name: NSNotification.Name("NavigationControllerDidSetViewController"),
+                object: self,
+                userInfo: ["viewController": viewController]
+            )
         }
     }
     
