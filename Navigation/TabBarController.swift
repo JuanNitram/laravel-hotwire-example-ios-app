@@ -58,7 +58,8 @@ class TabBarController: UITabBarController {
         selectedIndex = 0
         
         // Configure tab bar appearance
-        tabBar.tintColor = UIColor(named: "Tint")
+        tabBar.tintColor = UIColor.black
+        tabBar.unselectedItemTintColor = UIColor.systemGray
         tabBar.backgroundColor = UIColor.systemBackground
         
         // Add subtle border to top of tab bar
