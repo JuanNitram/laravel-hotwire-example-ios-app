@@ -1,5 +1,5 @@
 //
-//  SidebarContainerController.swift
+//  MainNavigationController.swift
 //  Demo
 //
 //  Created by Assistant on 01/01/24.
@@ -8,7 +8,7 @@
 import UIKit
 import Turbo
 
-class SidebarContainerController: UIViewController {
+class MainNavigationController: UIViewController {
     
     private let mainTabBarController: TabBarController
     private let sidebarMenuController: SidebarMenuController
@@ -347,7 +347,7 @@ class SidebarContainerController: UIViewController {
 }
 
 // MARK: - SidebarMenuDelegate
-extension SidebarContainerController: SidebarMenuDelegate {
+extension MainNavigationController: SidebarMenuDelegate {
     
     func sidebarMenuDidSelectDashboard() {
         print("🔄 Sidebar - Dashboard selected")

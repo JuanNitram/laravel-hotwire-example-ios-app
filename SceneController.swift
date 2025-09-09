@@ -9,7 +9,7 @@ final class SceneController: UIResponder {
     
     var window: UIWindow?
     private let rootURL = Demo.current
-    private var sidebarContainerController: SidebarContainerController!
+    private var mainNavigationController: MainNavigationController!
     
     // MARK: - Setup
     
@@ -20,16 +20,16 @@ final class SceneController: UIResponder {
         
         window.tintColor = UIColor(named: "Tint")
         
-        if let existingContainer = window.rootViewController as? SidebarContainerController {
-            sidebarContainerController = existingContainer
+        if let existingContainer = window.rootViewController as? MainNavigationController {
+            mainNavigationController = existingContainer
         } else {
             let tabBarController = TabBarController()
-            sidebarContainerController = SidebarContainerController(tabBarController: tabBarController)
-            window.rootViewController = sidebarContainerController
+            mainNavigationController = MainNavigationController(tabBarController: tabBarController)
+            window.rootViewController = mainNavigationController
         }
         
-        sidebarContainerController.session = session
-        sidebarContainerController.modalSession = modalSession
+        mainNavigationController.session = session
+        mainNavigationController.modalSession = modalSession
     }
     
     // MARK: - Authentication
@@ -37,7 +37,7 @@ final class SceneController: UIResponder {
     private func promptForAuthentication() {
         let authURL = rootURL.appendingPathComponent("/signin")
         let properties = pathConfiguration.properties(for: authURL)
-        sidebarContainerController.navigate(to: authURL, options: VisitOptions(), properties: properties)
+        mainNavigationController.navigate(to: authURL, options: VisitOptions(), properties: properties)
     }
     
     // MARK: - Sessions
@@ -75,13 +75,13 @@ extension SceneController: UIWindowSceneDelegate {
         configureRootViewController()
         // Navigate to dashboard by default
         let dashboardURL = rootURL.appendingPathComponent("/dashboard")
-        sidebarContainerController.navigate(to: dashboardURL, options: VisitOptions(action: .replace), properties: [:])
+        mainNavigationController.navigate(to: dashboardURL, options: VisitOptions(action: .replace), properties: [:])
     }
 }
 
 extension SceneController: SessionDelegate {
     func session(_ session: Session, didProposeVisit proposal: VisitProposal) {
-        sidebarContainerController.navigate(to: proposal.url, options: proposal.options, properties: proposal.properties)
+        mainNavigationController.navigate(to: proposal.url, options: proposal.options, properties: proposal.properties)
     }
     
     func session(_ session: Session, didFailRequestForVisitable visitable: Visitable, error: Error) {
@@ -94,7 +94,7 @@ extension SceneController: SessionDelegate {
         } else {
             let alert = UIAlertController(title: "Visit failed!", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            sidebarContainerController.present(alert, animated: true)
+            mainNavigationController.present(alert, animated: true)
         }
     }
 
@@ -143,8 +143,8 @@ extension SceneController: WKNavigationDelegate {
             // don't need to leave the app. You might expand this in your app
             // to open all audio/video/images in a native media viewer
             if url.host == rootURL.host, !url.pathExtension.isEmpty {
-                let safariViewController = SFSafariViewController(url: url)
-                sidebarContainerController.present(safariViewController, animated: true)
+            let safariViewController = SFSafariViewController(url: url)
+            mainNavigationController.present(safariViewController, animated: true)
             } else {
                 UIApplication.shared.open(url)
             }
