@@ -6,7 +6,8 @@ extension BridgeComponent {
         [
             FormComponent.self,
             MenuComponent.self,
-            OverflowMenuComponent.self
+            OverflowMenuComponent.self,
+            NavigationBridgeComponent.self
         ]
     }
 }

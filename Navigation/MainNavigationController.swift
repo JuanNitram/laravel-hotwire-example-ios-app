@@ -15,6 +15,7 @@ class MainNavigationController: UIViewController {
     
     private var isSidebarOpen = false
     private let sidebarWidth: CGFloat = 280
+    private var barsHiddenByWebEvent = false
     
     private lazy var overlayView: UIView = {
         let view = UIView()
@@ -152,6 +153,20 @@ class MainNavigationController: UIViewController {
             name: NSNotification.Name("RegularPageDetected"),
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideNavigationBarsFromWeb(_:)),
+            name: NSNotification.Name("HideNavigationBarsFromWeb"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showNavigationBarsFromWeb(_:)),
+            name: NSNotification.Name("ShowNavigationBarsFromWeb"),
+            object: nil
+        )
     }
     
     @objc private func settingsTabLoaded(_ notification: Notification) {
@@ -179,14 +194,25 @@ class MainNavigationController: UIViewController {
     }
     
     @objc private func loginPageDetected(_ notification: Notification) {
-        print("📡 SidebarContainer - Received LoginPageDetected notification")
-        print("📱 SidebarContainer - Login page detected, hiding navigation bars")
-        hideNavigationBars()
+        // Only hide bars based on route if no web event has taken control
+        if !barsHiddenByWebEvent {
+            hideNavigationBars()
+        }
     }
     
     @objc private func regularPageDetected(_ notification: Notification) {
-        print("📡 SidebarContainer - Received RegularPageDetected notification")
-        print("📱 SidebarContainer - Regular page detected, showing navigation bars")
+        // Reset web control flag and show bars for regular pages
+        barsHiddenByWebEvent = false
+        showNavigationBars()
+    }
+    
+    @objc private func hideNavigationBarsFromWeb(_ notification: Notification) {
+        barsHiddenByWebEvent = true
+        hideNavigationBars()
+    }
+    
+    @objc private func showNavigationBarsFromWeb(_ notification: Notification) {
+        barsHiddenByWebEvent = false
         showNavigationBars()
     }
     
@@ -314,8 +340,6 @@ class MainNavigationController: UIViewController {
     // MARK: - Navigation Bar Control
     
     func showNavigationBars() {
-        print("📱 SidebarContainer - Showing navigation bars")
-        
         // Show tab bar
         mainTabBarController.tabBar.isHidden = false
         
@@ -330,8 +354,6 @@ class MainNavigationController: UIViewController {
     }
     
     func hideNavigationBars() {
-        print("📱 SidebarContainer - Hiding navigation bars")
-        
         // Hide tab bar
         mainTabBarController.tabBar.isHidden = true
         
@@ -350,14 +372,12 @@ class MainNavigationController: UIViewController {
 extension MainNavigationController: SidebarMenuDelegate {
     
     func sidebarMenuDidSelectDashboard() {
-        print("🔄 Sidebar - Dashboard selected")
         let dashboardURL = Demo.current.appendingPathComponent("/dashboard")
         mainTabBarController.navigate(to: dashboardURL, options: VisitOptions(action: .replace))
         closeSidebar()
     }
     
     func sidebarMenuDidSelectSettings() {
-        print("🔄 Sidebar - Settings selected")
         let settingsURL = Demo.current.appendingPathComponent("/settings")
         mainTabBarController.navigate(to: settingsURL, options: VisitOptions(action: .replace))
         closeSidebar()

@@ -208,7 +208,7 @@ class CameraCaptureController: UIViewController {
                 captureSession.addInput(input)
             }
         } catch {
-            print("Error switching camera: \(error)")
+            // Handle camera switching error silently
         }
         
         captureSession.commitConfiguration()

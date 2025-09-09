@@ -99,15 +99,14 @@ extension SceneController: SessionDelegate {
     }
 
     func sessionDidFinishRequest(_ session: Session) {
-        // Check if we arrived at login
-        if let actualURL = session.webView.url, actualURL.path.hasPrefix("/login") {
-            print("🔐 LOGIN DETECTED: Request arrived at /login")
-            print("📡 Posting LoginPageDetected notification from SceneController")
-            NotificationCenter.default.post(name: NSNotification.Name("LoginPageDetected"), object: nil)
-        } else {
-            print("📱 Regular page detected: \(session.webView.url?.path ?? "unknown")")
-            print("📡 Posting RegularPageDetected notification from SceneController")
-            NotificationCenter.default.post(name: NSNotification.Name("RegularPageDetected"), object: nil)
+        // Delay route-based detection to allow web events to take precedence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // Check if we arrived at login
+            if let actualURL = session.webView.url, actualURL.path.hasPrefix("/login") {
+                NotificationCenter.default.post(name: NSNotification.Name("LoginPageDetected"), object: nil)
+            } else {
+                NotificationCenter.default.post(name: NSNotification.Name("RegularPageDetected"), object: nil)
+            }
         }
     }
     

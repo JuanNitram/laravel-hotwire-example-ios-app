@@ -36,17 +36,16 @@ final class TurboWebViewController: VisitableViewController,
         super.viewDidAppear(animated)
         bridgeDelegate.onViewDidAppear()
         
-        // Check if we're on login page
-        if let url = visitableURL, url.path.hasPrefix("/login") {
-            print("🔐 LOGIN DETECTED: View appeared on /login")
-            print("📡 Posting LoginPageDetected notification")
-            // Hide navigation bars when login view appears
-            NotificationCenter.default.post(name: NSNotification.Name("LoginPageDetected"), object: nil)
-        } else {
-            print("📱 Regular page detected: \(visitableURL?.path ?? "unknown")")
-            print("📡 Posting RegularPageDetected notification")
-            // Show navigation bars when not on login page
-            NotificationCenter.default.post(name: NSNotification.Name("RegularPageDetected"), object: nil)
+        // Delay route-based detection to allow web events to take precedence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self = self else { return }
+            
+            // Check if we're on login page
+            if let url = self.visitableURL, url.path.hasPrefix("/login") {
+                NotificationCenter.default.post(name: NSNotification.Name("LoginPageDetected"), object: nil)
+            } else {
+                NotificationCenter.default.post(name: NSNotification.Name("RegularPageDetected"), object: nil)
+            }
         }
     }
     

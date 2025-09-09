@@ -54,7 +54,6 @@ extension CameraBridgeComponent: CameraCaptureDelegate {
         viewController.dismiss(animated: true) {
             // Convert image to JPEG data
             guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-                print("Failed to convert image to JPEG data")
                 return
             }
             
