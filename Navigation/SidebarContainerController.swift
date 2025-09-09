@@ -290,15 +290,17 @@ class SidebarContainerController: UIViewController {
 extension SidebarContainerController: SidebarMenuDelegate {
     
     func sidebarMenuDidSelectDashboard() {
-        mainTabBarController.selectedIndex = 0
-        let dashboardURL = URL(string: "http://localhost:8000/dashboard")!
+        print("🔄 Sidebar - Dashboard selected")
+        let dashboardURL = Demo.current.appendingPathComponent("/dashboard")
         mainTabBarController.navigate(to: dashboardURL, options: VisitOptions(action: .replace))
+        closeSidebar()
     }
     
     func sidebarMenuDidSelectSettings() {
-        mainTabBarController.selectedIndex = 1
-        let settingsURL = URL(string: "http://localhost:8000/settings")!
+        print("🔄 Sidebar - Settings selected")
+        let settingsURL = Demo.current.appendingPathComponent("/settings")
         mainTabBarController.navigate(to: settingsURL, options: VisitOptions(action: .replace))
+        closeSidebar()
     }
     
     func sidebarMenuShouldClose() {
