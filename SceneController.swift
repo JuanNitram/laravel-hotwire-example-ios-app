@@ -98,6 +98,19 @@ extension SceneController: SessionDelegate {
         }
     }
 
+    func sessionDidFinishRequest(_ session: Session) {
+        // Check if we arrived at login
+        if let actualURL = session.webView.url, actualURL.path.hasPrefix("/login") {
+            print("🔐 LOGIN DETECTED: Request arrived at /login")
+            print("📡 Posting LoginPageDetected notification from SceneController")
+            NotificationCenter.default.post(name: NSNotification.Name("LoginPageDetected"), object: nil)
+        } else {
+            print("📱 Regular page detected: \(session.webView.url?.path ?? "unknown")")
+            print("📡 Posting RegularPageDetected notification from SceneController")
+            NotificationCenter.default.post(name: NSNotification.Name("RegularPageDetected"), object: nil)
+        }
+    }
+    
     // When a form submission completes in the modal session, we need to
     // manually clear the snapshot cache in the default session, since we
     // don't want potentially stale cached snapshots to be used

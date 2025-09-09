@@ -138,6 +138,20 @@ class SidebarContainerController: UIViewController {
             name: NSNotification.Name("NavigationControllerDidSetViewController"),
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(loginPageDetected(_:)),
+            name: NSNotification.Name("LoginPageDetected"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(regularPageDetected(_:)),
+            name: NSNotification.Name("RegularPageDetected"),
+            object: nil
+        )
     }
     
     @objc private func settingsTabLoaded(_ notification: Notification) {
@@ -162,6 +176,18 @@ class SidebarContainerController: UIViewController {
             
             viewController.navigationItem.leftBarButtonItem = barButtonItem
         }
+    }
+    
+    @objc private func loginPageDetected(_ notification: Notification) {
+        print("📡 SidebarContainer - Received LoginPageDetected notification")
+        print("📱 SidebarContainer - Login page detected, hiding navigation bars")
+        hideNavigationBars()
+    }
+    
+    @objc private func regularPageDetected(_ notification: Notification) {
+        print("📡 SidebarContainer - Received RegularPageDetected notification")
+        print("📱 SidebarContainer - Regular page detected, showing navigation bars")
+        showNavigationBars()
     }
     
     private func configureNavigationBarAppearance(for navigationController: UINavigationController) {
@@ -283,6 +309,40 @@ class SidebarContainerController: UIViewController {
     var modalSession: Session! {
         get { mainTabBarController.modalSession }
         set { mainTabBarController.modalSession = newValue }
+    }
+    
+    // MARK: - Navigation Bar Control
+    
+    func showNavigationBars() {
+        print("📱 SidebarContainer - Showing navigation bars")
+        
+        // Show tab bar
+        mainTabBarController.tabBar.isHidden = false
+        
+        // Show navigation bars in all navigation controllers
+        if let viewControllers = mainTabBarController.viewControllers {
+            for viewController in viewControllers {
+                if let navController = viewController as? UINavigationController {
+                    navController.isNavigationBarHidden = false
+                }
+            }
+        }
+    }
+    
+    func hideNavigationBars() {
+        print("📱 SidebarContainer - Hiding navigation bars")
+        
+        // Hide tab bar
+        mainTabBarController.tabBar.isHidden = true
+        
+        // Hide navigation bars in all navigation controllers
+        if let viewControllers = mainTabBarController.viewControllers {
+            for viewController in viewControllers {
+                if let navController = viewController as? UINavigationController {
+                    navController.isNavigationBarHidden = true
+                }
+            }
+        }
     }
 }
 
