@@ -1,7 +1,7 @@
 import Foundation
 
 struct Demo {
-    static let basic = URL(string: "https://3e33c48ff4c8.ngrok-free.app")!
+    static let basic = URL(string: "https://73a667edd86d.ngrok-free.app")!
     static let turbolinks5 = URL(string: "http://192.168.1.46:8000/dashboard?turbolinks=1")!
     
     static let local = URL(string: "http://localhost:8000")!

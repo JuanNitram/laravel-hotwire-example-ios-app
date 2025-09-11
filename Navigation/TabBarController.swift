@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import WebKit
 import Turbo
 import Strada
 
@@ -21,6 +22,10 @@ class TabBarController: UITabBarController {
             configureSessionsIfReady()
         }
     }
+    
+    // Separate sessions for each tab to prevent interference
+    private var dashboardSession: Session!
+    private var settingsSession: Session!
     private let rootURL = Demo.current
     
     // Navigation controllers for each tab
@@ -83,16 +88,36 @@ class TabBarController: UITabBarController {
               dashboardNavController != nil,
               settingsNavController != nil else { return }
         
+        // Create separate sessions for each tab to prevent interference
+        dashboardSession = createSeparateSession(from: session)
+        settingsSession = createSeparateSession(from: session)
+        
         // Configure sessions for each navigation controller
-        dashboardNavController.session = session
+        dashboardNavController.session = dashboardSession
         dashboardNavController.modalSession = modalSession
         
-        settingsNavController.session = session
+        settingsNavController.session = settingsSession
         settingsNavController.modalSession = modalSession
         
         // Load initial routes now that sessions are configured
         loadInitialRoutes()
         isInitialSetupComplete = true
+    }
+    
+    private func createSeparateSession(from originalSession: Session) -> Session {
+        // Create a fresh web view with proper app configuration
+        let webView = WKWebView(frame: .zero, configuration: .appConfiguration)
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
+        
+        // Initialize Strada bridge for the new web view
+        Bridge.initialize(webView)
+        
+        let newSession = Session(webView: webView)
+        newSession.delegate = originalSession.delegate
+        newSession.pathConfiguration = originalSession.pathConfiguration
+        return newSession
     }
     
     private func loadInitialRoutes() {
@@ -138,12 +163,15 @@ class TabBarController: UITabBarController {
     // Public method to navigate to a specific URL
     func navigate(to url: URL, options: VisitOptions = VisitOptions(), properties: PathProperties = [:]) {
         let path = url.path
+
+        print("🌉 BEFORE - TabBarController - Navigating to: \(path)")
         
         // Determine which tab should handle this URL
         if path.hasPrefix("/dashboard") {
             selectedIndex = 0
             dashboardNavController.route(url: url, options: options, properties: properties)
         } else if path.hasPrefix("/settings") {
+            print("🌉 TabBarController - Navigating to settings")
             selectedIndex = 1
             settingsNavController.route(url: url, options: options, properties: properties)
         } else {

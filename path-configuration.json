@@ -24,6 +24,17 @@
     },
     {
       "patterns": [
+        "^/settings/.+"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "hotwire://fragment/web",
+        "pull_to_refresh_enabled": false,
+        "presentation": "modal"
+      }
+    },
+    {
+      "patterns": [
         "/login"
       ],
       "properties": {
